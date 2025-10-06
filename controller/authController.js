@@ -60,6 +60,7 @@ export const login = async (req, res) => {
       accessToken: accessToken,
       email: existingUser,
       id: existingUser._id,
+      role : existingUser.role
     });
   } catch (error) {
     console.error(error.message);

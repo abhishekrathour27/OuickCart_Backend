@@ -1,10 +1,9 @@
-import mongoose from "mongoose";
 import response from "../utils/responsehandler.js";
 import Product from "../models/productModel.js";
 
 export const createProduct = async (req, res) => {
   try {
-    const { name, price, category, offerPrice, description } = req.body;
+    const { name, price, offerPrice , category, description } = req.body;
 
     if (!name || !price || !category || !description) {
       return response(res, 400, "All fields are required");
@@ -136,7 +135,7 @@ export const removeFromWishlist = async (req, res) => {
       (id) => id.toString() !== userID.toString()
     );
     await productData.save();
-    return response(res, 201, "remove from wishlist successfull");
+    return response(res, 201, "Successfullyremove from wishlist ");
   } catch (error) {
     response(res, 500, error.message);
   }
