@@ -46,3 +46,19 @@ export const createAddress = async (req, res) => {
     return response(res, 500, error.message);
   }
 };
+
+export const removeAddress = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const userId = req.user;
+
+    const deleteAddress = await Address.findOneAndDelete({ _id: id, userId });
+    if (!deleteAddress) {
+      return response(res, 404, "Address not found");
+    }
+
+    return response(res, 201, "Address deleted ", deleteAddress);
+  } catch (error) {
+    response(error.message);
+  }
+};
