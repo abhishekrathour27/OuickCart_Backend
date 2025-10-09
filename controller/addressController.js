@@ -37,11 +37,28 @@ export const createAddress = async (req, res) => {
     });
 
     const existAddress = await Address.find({ userId });
-    if (existAddress.length === 0) {
+    console.log(existAddress);
+    if (existAddress.length === 1) {
       newAddress.isDefault = true;
       await newAddress.save();
     }
+    // console.log("object", newAddress.isDefault);
     return response(res, 200, "Address created successfully", newAddress);
+  } catch (error) {
+    return response(res, 500, error.message);
+  }
+};
+
+export const getAddress = async (req, res) => {
+  try {
+    const userId = req.user;
+
+    const existAddress = await Address.find({ userId });
+    if (!existAddress) {
+      return response(res, 404, "user with this Id not found");
+    }
+    console.log("addddd", existAddress);
+    return response(res, 200, "address get successfully", existAddress);
   } catch (error) {
     return response(res, 500, error.message);
   }
@@ -60,5 +77,26 @@ export const removeAddress = async (req, res) => {
     return response(res, 201, "Address deleted ", deleteAddress);
   } catch (error) {
     response(error.message);
+  }
+};
+
+export const updateAddress = async (req, res) => {
+  try {
+    const userId = req.user;
+    const { id, ...updateData } = req.body;
+
+    if (!id) {
+      response(res, 404, "Address id is required");
+    }
+
+    const updated = await Address.findOneAndUpdate(
+      { _id: id, userId: userId }, // yahan object valid hai
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    return response(res, 200, "Address is updated", updated);
+  } catch (error) {
+    response(res, 500, error.message);
   }
 };
