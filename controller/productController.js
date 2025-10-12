@@ -1,18 +1,42 @@
 import response from "../utils/responsehandler.js";
 import Product from "../models/productModel.js";
+import cloudinary from "../config/cloudinary.js";
 
 export const createProduct = async (req, res) => {
   try {
-    const { name, price, offerPrice , category, description } = req.body;
+    const { name, price, offerPrice, category, description, images } = req.body;
 
+    // 🔹 Validation
     if (!name || !price || !category || !description) {
       return response(res, 400, "All fields are required");
     }
 
-    const newProduct = await Product.create(req.body);
+    // 🔹 Cloudinary Upload (Base64 se)
+    let uploadedImages = [];
+    if (images && Array.isArray(images) && images.length > 0) {
+      const uploadPromises = images.map(async (base64Image) => {
+        const result = await cloudinary.uploader.upload(base64Image, {
+          folder: "productImage",
+        });
+        return result.secure_url;
+      });
+
+      uploadedImages = await Promise.all(uploadPromises);
+    }
+
+    // 🔹 Save product
+    const newProduct = await Product.create({
+      name,
+      price,
+      offerPrice,
+      category,
+      description,
+      images: uploadedImages, // array of URLs
+    });
 
     return response(res, 201, "Product created successfully", newProduct);
   } catch (error) {
+    console.error(error);
     return response(res, 500, error.message);
   }
 };
@@ -98,10 +122,6 @@ export const getWishlistProduct = async (req, res) => {
     // .populate("wishlistProduct");
 
     // console.log("wish",wishlistProduct);
-
-    if (!wishlistProduct ) {
-      return response(res, 404, "Wishlist is empty");
-    }
 
     return response(
       res,

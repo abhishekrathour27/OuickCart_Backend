@@ -60,7 +60,7 @@ export const login = async (req, res) => {
       accessToken: accessToken,
       email: existingUser,
       id: existingUser._id,
-      role : existingUser.role
+      role: existingUser.role,
     });
   } catch (error) {
     console.error(error.message);
@@ -152,7 +152,7 @@ export const getUserProfile = async (req, res) => {
     if (!userID) {
       return response(res, 404, "User not found");
     }
-    const user = await auth.findById({_id : userID}).select("-password");
+    const user = await auth.findById({ _id: userID }).select("-password");
     if (!user) {
       return response(res, 404, "user not found");
     }
@@ -161,5 +161,23 @@ export const getUserProfile = async (req, res) => {
     });
   } catch (error) {
     response(res, 400, error.message);
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user;
+    const { ...data } = req.body;
+
+    console.log("userdata", data);
+
+    const updateUser = await auth.findByIdAndUpdate({ _id: userId }, data, {
+      new: true,
+      runValidators: true,
+    });
+
+    return response(res, 202, "Profile is updated", updateUser);
+  } catch (error) {
+   return response(res, 500, error.message);
   }
 };

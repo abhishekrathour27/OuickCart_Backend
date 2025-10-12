@@ -54,10 +54,8 @@ export const getAddress = async (req, res) => {
     const userId = req.user;
 
     const existAddress = await Address.find({ userId });
-    if (!existAddress) {
-      return response(res, 404, "user with this Id not found");
-    }
-    console.log("addddd", existAddress);
+
+    // console.log("addddd", existAddress);
     return response(res, 200, "address get successfully", existAddress);
   } catch (error) {
     return response(res, 500, error.message);
@@ -70,9 +68,6 @@ export const removeAddress = async (req, res) => {
     const userId = req.user;
 
     const deleteAddress = await Address.findOneAndDelete({ _id: id, userId });
-    if (!deleteAddress) {
-      return response(res, 404, "Address not found");
-    }
 
     return response(res, 201, "Address deleted ", deleteAddress);
   } catch (error) {
@@ -84,16 +79,15 @@ export const updateAddress = async (req, res) => {
   try {
     const userId = req.user;
     const { id, ...updateData } = req.body;
-
-    if (!id) {
-      response(res, 404, "Address id is required");
-    }
+    // console.log("idd",id)
+    // console.log("dataa",updateData)
 
     const updated = await Address.findOneAndUpdate(
       { _id: id, userId: userId }, // yahan object valid hai
-      updateData,
+      updateData.updateData,
       { new: true, runValidators: true }
     );
+
 
     return response(res, 200, "Address is updated", updated);
   } catch (error) {

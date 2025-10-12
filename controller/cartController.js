@@ -41,7 +41,6 @@ export const getCartData = async (req, res) => {
     const userId = req.user;
     const cartData = await cart.findOne({ userId }).populate("items.productId");
 
-    console.log("cartData", cartData);
 
     // cartData.save();
     return response(res, 200, "successfully get cart data", cartData);
